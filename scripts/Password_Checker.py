@@ -1,10 +1,13 @@
+import os
 import random
 import string
 import re
 import math
 
+# Folder containing the insult text files
+INSULT_FOLDER = "src"
+
 # Brute force speed estimates based on known attack rates
-# Values are in attempts per second (approximate estimates based on modern hardware)
 BRUTE_FORCE_SPEEDS = {
     "Basic GPU (100M/s)": 1e8,    # Low-end GPU rig
     "Advanced GPU (10B/s)": 1e10,  # Advanced GPU rig
@@ -72,59 +75,17 @@ def estimate_crack_time(password_length, char_pool):
 
     return time_estimates
 
-import random
+def get_random_insult(score):
+    """Reads a random insult from the appropriate file based on score."""
+    filename = os.path.join(INSULT_FOLDER, f"Level_{score}_Insults.txt")
 
-def insult_password(score):
-    """Returns a random insult based on password strength."""
-    insults = {
-        1: [
-            "Your password is basically a speedrun for hackers.",
-            "Even a potato could crack this.",
-            "I think my cat just guessed your password.",
-            "This is less secure than a sticky note on your monitor.",
-            "Are you trying to get hacked for sport?",
-            "This password is one Google search away from being exposed.",
-            "I've seen better security on a luggage lock."
-        ],
-        2: [
-            "This is marginally better than leaving the field blank.",
-            "You might as well use 'password123'.",
-            "Hackers will send you a thank-you note.",
-            "This is the digital equivalent of locking your front door but leaving all the windows open.",
-            "Slightly less terrible, but still a hacker’s dream.",
-            "Your password is one lucky guess away from disaster.",
-            "Honestly, a toddler could guess this."
-        ],
-        3: [
-            "Mildly better, but still trash.",
-            "Did you think adding a number would help?",
-            "This is what we call 'hacker bait'.",
-            "You're at the level where an intern hacker would break in just for practice.",
-            "A dictionary attack would eat this for breakfast.",
-            "Your password is like a house with a 'No Burglars Allowed' sign.",
-            "Might as well hand out your login info on business cards."
-        ],
-        4: [
-            "Not bad, but still kind of meh.",
-            "A decent attempt, but don’t get cocky.",
-            "You're on the right path, but still in hacker snack territory.",
-            "This might stop a lazy hacker, but not a determined one.",
-            "Security level: toddler-proof.",
-            "You added some complexity, but not enough to impress anyone.",
-            "Try again, and this time, pretend you care."
-        ],
-        10: [
-            "Hacker-proof. Well played.",
-            "This password could outlive the universe.",
-            "You're basically a cybersecurity god.",
-            "Congratulations, even quantum computers will struggle with this.",
-            "This is so secure, I’m afraid to even look at it.",
-            "Your password is so strong that even you might forget it.",
-            "Even the NSA would be impressed."
-        ]
-    }
-    return random.choice(insults.get(score, ["You're doing... okay."]))
+    if not os.path.exists(filename):
+        return "No insults available for this level. Consider being more creative with your passwords!"
 
+    with open(filename, "r", encoding="utf-8") as file:
+        insults = file.readlines()
+
+    return random.choice(insults).strip() if insults else "Somehow, this insult file is empty. That's an insult in itself."
 
 def generate_password(strength):
     """Generates a password based on the desired strength (1-10)."""
@@ -151,9 +112,9 @@ def main_menu():
             crack_times = estimate_crack_time(len(user_password), char_pool)
 
             print(f" Password Strength Score: {score}/10")
-            print(insult_password(score))
+            print(get_random_insult(score))  # Get insult from correct file
 
-            print(" Estimated Crack Time with Brute Force:")
+            print("\n Estimated Crack Time with Brute Force:")
             for method, time in crack_times.items():
                 print(f"  {method}: {time}")
 
