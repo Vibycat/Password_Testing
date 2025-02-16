@@ -3,9 +3,16 @@ import random
 import string
 import re
 import math
+import sys
 
-# Folder containing the insult text files
-INSULT_FOLDER = "src"
+# Detect whether running from a PyInstaller .exe or from the script
+if getattr(sys, 'frozen', False):
+    # Running as a bundled .exe
+    INSULT_FOLDER = os.path.join(sys._MEIPASS, "src")
+else:
+    # Running as a normal script
+    INSULT_FOLDER = os.path.join(os.getcwd(), "src")
+
 
 # Brute force speed estimates based on known attack rates
 BRUTE_FORCE_SPEEDS = {
